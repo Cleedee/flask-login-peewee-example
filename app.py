@@ -1,12 +1,13 @@
-from flask import Flask, flash
-from flask_login import LoginManager, login_required
+import flask
+from flask_login import LoginManager, login_required, login_user
 from forms import LoginForm
 
 from database import User
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = 'o4t4bnoto4yb9y6843q4b4n387q'
 login_manager = LoginManager()
+login_manager.login_view = 'login'
 login_manager.init_app(app)
 
 @login_manager.user_loader
@@ -25,8 +26,8 @@ def login():
     # handle this for us, and we use a custom LoginForm to validate.
     form = LoginForm()
     if form.validate_on_submit():
-        # Login and validate the user.
-        # user should be an instance of your `User` class
+        user = User.select().where(User.email == form.email.data).get()
+
         login_user(user)
 
         flask.flash('Logged in successfully.')
@@ -39,3 +40,9 @@ def login():
 
         return flask.redirect(next or flask.url_for('index'))
     return flask.render_template('login.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
