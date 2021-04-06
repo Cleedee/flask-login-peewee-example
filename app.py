@@ -1,6 +1,8 @@
 import flask
 from flask_login import LoginManager, login_required, login_user
+from flask_login import logout_user
 from forms import LoginForm
+import click
 
 from database import User
 
@@ -45,4 +47,10 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return flask.redirect(flask.url_for('index'))
+
+@app.cli.command('create-user')
+@click.argument('name')
+@click.argument('email')
+def create_user(name, email):
+    User.create(name=name, email=email, password='123')
