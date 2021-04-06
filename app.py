@@ -4,7 +4,7 @@ from flask_login import logout_user
 from forms import LoginForm
 import click
 
-from database import User
+from database import User, db
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = 'o4t4bnoto4yb9y6843q4b4n387q'
@@ -48,6 +48,10 @@ def login():
 def logout():
     logout_user()
     return flask.redirect(flask.url_for('index'))
+
+@app.cli.command('create-database')
+def create_database():
+    db.create_tables([User])
 
 @app.cli.command('create-user')
 @click.argument('name')
